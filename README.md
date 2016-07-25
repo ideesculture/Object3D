@@ -6,7 +6,7 @@
 - Download and install this project directory inside pawtucket2/app/plugins
 - Modify the ca_objects_default_html.php inside your theme dir following the example
 
-## Modifying ca_places_default_html.php
+## Modifying ca_objects_default_html.php
 
 ````php
 	<?php 

@@ -138,16 +138,16 @@ else{
 				THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
 
 				var mtlLoader = new THREE.MTLLoader();
-				mtlLoader.setPath('<?php print $folderurl; ?>'); //récupérer le path vers le dossier qui contient les fichiers
-				mtlLoader.setBaseUrl('<?php print $folderurl; ?>');
+				mtlLoader.setPath('http://object3d.dev/<?php print $folderurl; ?>/'); //récupérer le path vers le dossier qui contient les fichiers
+				//mtlLoader.setBaseUrl('<?php print $folderurl; ?>');
 				mtlLoader.load('<?php print $foldername; ?>.mtl', function( materials ) { //récupérer le nom du mtl
 
 					materials.preload();
 
 					var objLoader = new THREE.OBJLoader();
 					objLoader.setMaterials( materials );
-					objLoader.setBaseUrl('<?php print $folderurl; ?>');
-					objLoader.setPath('<?php print $folderurl; ?>'); //récupérer le path vers le dossier qui contient les fichiers
+					//objLoader.setBaseUrl('<?php print $folderurl; ?>');
+					objLoader.setPath('http://object3d.dev/<?php print $folderurl; ?>/'); //récupérer le path vers le dossier qui contient les fichiers
 					objLoader.load('<?php print $foldername; ?>.obj', function ( object ) { //récupérer le nom de l'obj
 
 						object.position.y = - 95;

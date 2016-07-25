@@ -1,14 +1,9 @@
 <?php
-error_reporting(E_ALL);
-ini_set("display_errors", 1);
-
-include('../../../setup.php')
 require_once(__CA_APP_DIR__.'/models/ca_objects.php');
 
 $id_object = 26;
 $vt_object = new ca_object($id_object);
-var_dump($vt_object);
-die();
+
 $path3ddisplay = $vt_object->get("ca_objects.fichier3d");
 $path3dfilename = reset(explode("\n", strip_tags(str_replace("</div>", "</div>\n", $path3ddisplay))));
 $path3d = $vt_object->get("ca_objects.fichier3d", array("return"=>"path"));

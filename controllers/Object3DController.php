@@ -50,6 +50,8 @@ class Object3DController extends BasePluginController {
 	 *
 	 */
 	public function Viewer() {
+
+		
 		$view_pan = $this->render("viewer_html.php");
 		print $view_pan;
 		die();

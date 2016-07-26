@@ -26,9 +26,6 @@ if(is_dir($res)){
 		print 'l obj a le bon nom';
 	}
 	exec('cd '.$res.'/');
-	$dir = $res.'/';
-	$files = scandir($dir);
-	print_r($files);
 }
 else{
 	if($path_parts['extension'] == 'zip'){
@@ -38,10 +35,7 @@ else{
 		if($test === TRUE){
 			exec('cd '.$path.' && mkdir '.$path_parts['filename'].' && chmod 777 '.$path_parts['filename'].'/');
 			$extract = $zip->extractTo($res.'/');
-			$ferme = $zip->close();
-			$dir = $res.'/';
-			$files = scandir($dir);
-			print_r($files);
+			$ferme = $zip->close();;
 			exec('cd '.$path.' && chmod -R 777 *');
 		}
 		else{
@@ -93,6 +87,7 @@ else{
 
 <script src="<?php print __CA_URL_ROOT__."/app/plugins/Object3D/lib/"; ?>Threejs/js/Detector.js"></script>
 <script src="<?php print __CA_URL_ROOT__."/app/plugins/Object3D/lib/"; ?>Threejs/js/libs/stats.min.js"></script>
+<h2><?php print $foldername ?></h2>
 
 <script>
 

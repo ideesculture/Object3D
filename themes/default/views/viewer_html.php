@@ -103,9 +103,15 @@ else{
     margin: 120px auto 120px auto;
 
 }
+
 </style>
+<head>
+	<script src="../../../node_modules/jquery/dist/jquery.min.js"></script>
+</head>
+
 <h2><?php print $foldername ?></h2>
 <p id="preload"></p>
+
 
 <script>
 
@@ -177,6 +183,7 @@ else{
 						console.log( Math.round(percentComplete, 2) + '% downloaded' );
 					}
 				};
+
 
 				var onError = function ( xhr ) { };
 

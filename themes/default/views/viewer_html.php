@@ -15,7 +15,10 @@ $path_parts = pathinfo($path3d);
 $path = str_replace("//media/".__CA_APP_NAME__, "", $path_parts['dirname']);
 $res = $path."/".$path_parts['filename'];
 $load = true;
-if(filesize($res)>20480) $load=false;
+if(filesize($res)>10240){
+	$load=false;
+	die("l'objet à afficher est trop lourd et pourrait faire planter votre navigateur");
+}
 $folderurl = __CA_URL_ROOT__.str_replace(__CA_BASE_DIR__,"", $res)."/".$foldername;
 //var_dump($res);
 if(is_dir($res)){

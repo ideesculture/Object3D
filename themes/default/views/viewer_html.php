@@ -105,171 +105,175 @@ else{
 }
 
 </style>
-<head>
-	<script src="../../../node_modules/jquery/dist/jquery.min.js"></script>
-</head>
+<script src="<?php print __CA_URL_ROOT__."/app/plugins/Object3D/lib/"; ?>node_modules/jquery/dist/jquery.min.js"></script>
+<script src="<?php print __CA_URL_ROOT__."/app/plugins/Object3D/lib/"; ?>jquery-circle-progress/dist/circle-progress.js"></script>
 
 <h2><?php print $foldername ?></h2>
 <p id="preload"></p>
+<div id="circle"></div>
 
 
 <script>
 
-			var container, stats;
+	var container, stats;
 
-			var camera, scene, renderer;
+	var camera, scene, renderer;
 
-			var controls;
+	var controls;
 
-			var mouseX = 0, mouseY = 0;
+	var mouseX = 0, mouseY = 0;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
-
-
-			init();
-			animate();
+	var windowHalfX = window.innerWidth / 2;
+	var windowHalfY = window.innerHeight / 2;
 
 
-			function init() {
-
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.z = 250;
-
-				controls = new THREE.TrackballControls( camera );
-
-				controls.rotateSpeed = 11.0;
-				controls.zoomSpeed = 1.2;
-				controls.panSpeed = 0.8;
-
-				controls.noZoom = false;
-				controls.noPan = false;
-
-				controls.staticMoving = true;
-				controls.dynamicDampingFactor = 0.3;
-
-				controls.keys = [ 65, 83, 68 ];
-
-				controls.addEventListener( 'change', render );
+	init();
+	animate();
 
 
-				// scene
+	function init() {
 
-				scene = new THREE.Scene();
+		container = document.createElement( 'div' );
+		document.body.appendChild( container );
+		camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+		camera.position.z = 250;
 
-				var ambient = new THREE.AmbientLight( 0x444444 );
-				scene.add( ambient );
+		controls = new THREE.TrackballControls( camera );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
-				directionalLight.position.set( 0, 0, 1 ).normalize();
-				scene.add( directionalLight );
+		controls.rotateSpeed = 11.0;
+		controls.zoomSpeed = 1.2;
+		controls.panSpeed = 0.8;
 
-				var isloaded = false;
-				var preload = document.getElementById("preload");
+		controls.noZoom = false;
+		controls.noPan = false;
 
-				if(<?php print $load ?> == true && isloaded == false){
-					preload.textContent = "Click anywhere to load the image";
-					window.onclick = loadFunction;
-				}
-				// model
+		controls.staticMoving = true;
+		controls.dynamicDampingFactor = 0.3;
 
-				var onProgress = function ( xhr ) {
-					if ( xhr.lengthComputable ) {
-						var percentComplete = xhr.loaded / xhr.total * 100;
-						preload.textContent = Math.round(percentComplete, 2) + '% downloaded';
-						console.log( Math.round(percentComplete, 2) + '% downloaded' );
+		controls.keys = [ 65, 83, 68 ];
+
+		controls.addEventListener( 'change', render );
+
+
+		// scene
+
+		scene = new THREE.Scene();
+
+		var ambient = new THREE.AmbientLight( 0x444444 );
+		scene.add( ambient );
+
+		var directionalLight = new THREE.DirectionalLight( 0xffeedd );
+		directionalLight.position.set( 0, 0, 1 ).normalize();
+		scene.add( directionalLight );
+
+		var isloaded = false;
+		var preload = document.getElementById("preload");
+		var circle = document.getElementById("circle");
+
+		if(<?php print $load ?> == true && isloaded == false){
+			preload.textContent = "Click anywhere to load the image";
+			window.onclick = loadFunction;
+		}
+		// model
+
+		var onProgress = function ( xhr ) {
+			if ( xhr.lengthComputable ) {
+				var percentComplete = xhr.loaded / xhr.total * 100;
+				preload.textContent = Math.round(percentComplete, 2) + '% downloaded';
+				jQuery('#circle').circleProgress({
+					value: Math.round(percentComplete, 2),
+					size: 80,
+					fill: {
+						gradient: ["red", "orange"]
 					}
-				};
+				});
+				console.log( Math.round(percentComplete, 2) + '% downloaded' );
+			}
+		};
 
+		var onError = function ( xhr ) { };
 
-				var onError = function ( xhr ) { };
+		THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
 
-				THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
-
-				var mtlLoader = new THREE.MTLLoader();
+		var mtlLoader = new THREE.MTLLoader();
 				
 				
-				//mtlLoader.setBaseUrl('<?php print $folderurl; ?>');
+		//mtlLoader.setBaseUrl('<?php print $folderurl; ?>');
 				
 
-				function loadFunction(){
-					if(isloaded == false){
-						mtlLoader.setPath('http://pawtucket.dev/<?php print $folderurl; ?>/'); //récupérer le path vers le dossier qui contient les fichiers
-						mtlLoader.load('<?php print $foldername; ?>.mtl', function( materials ) { //récupérer le nom du mtl
-							materials.preload();
-							var objLoader = new THREE.OBJLoader();
-							objLoader.setMaterials( materials );
-							//objLoader.setBaseUrl('<?php print $folderurl; ?>');
-							objLoader.setPath('http://pawtucket.dev/<?php print $folderurl; ?>/'); //récupérer le path vers le dossier qui contient les fichiers
-							objLoader.load('<?php print $foldername; ?>.obj', function ( object ) { //récupérer le nom de l'object
+		function loadFunction(){
+			if(isloaded == false){
+				mtlLoader.setPath('http://pawtucket.dev/<?php print $folderurl; ?>/'); //récupérer le path vers le dossier qui contient les fichiers
+				mtlLoader.load('<?php print $foldername; ?>.mtl', function( materials ) { //récupérer le nom du mtl
+					materials.preload();
+					var objLoader = new THREE.OBJLoader();
+					objLoader.setMaterials( materials );
+					//objLoader.setBaseUrl('<?php print $folderurl; ?>');
+					objLoader.setPath('http://pawtucket.dev/<?php print $folderurl; ?>/'); //récupérer le path vers le dossier qui contient les fichiers
+					objLoader.load('<?php print $foldername; ?>.obj', function ( object ) { //récupérer le nom de l'object
 
-								object.position.y = 0;
-								scene.add( object );
-								preload.style.display = "none";
+						object.position.y = 0;
+						scene.add( object );
+						preload.style.display = "none";
+						//circle.style.display = "none";
 
-							}, onProgress, onError );
+					}, onProgress, onError );
 
-						});	
-					}
-					isloaded = true;
+				});	
+			}
+			isloaded = true;
 					
-				}
-				//
+		}
+		//
 
-				renderer = new THREE.WebGLRenderer();
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
+		renderer = new THREE.WebGLRenderer();
+		renderer.setPixelRatio( window.devicePixelRatio );
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		container.appendChild( renderer.domElement );
+		//document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
-				//document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+		//
 
-				//
+		window.addEventListener( 'resize', onWindowResize, false );
 
-				window.addEventListener( 'resize', onWindowResize, false );
+	}
 
-			}
+	function onWindowResize() {
 
-			function onWindowResize() {
+		windowHalfX = window.innerWidth / 2;
+		windowHalfY = window.innerHeight / 2;
 
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
+		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.updateProjectionMatrix();
 
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
+		renderer.setSize( window.innerWidth, window.innerHeight );
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+	}
 
-			}
+	//function onDocumentMouseMove( event ) {
 
-			//function onDocumentMouseMove( event ) {
+	//	mouseX = ( event.clientX - windowHalfX ) / 2;
+	//	mouseY = ( event.clientY - windowHalfY ) / 2;
 
-			//	mouseX = ( event.clientX - windowHalfX ) / 2;
-			//	mouseY = ( event.clientY - windowHalfY ) / 2;
+	//}
 
-			//}
+	//
 
-			//
+	function animate() {
 
-			function animate() {
+		requestAnimationFrame( animate );
+		controls.update();
+		render();
 
-				requestAnimationFrame( animate );
-				controls.update();
-				render();
+	}
 
-			}
+	function render() {
 
-			function render() {
+		//camera.position.x += ( mouseX - camera.position.x ) * .05;
+		//camera.position.y += ( - mouseY - camera.position.y ) * .05;
+		camera.lookAt( scene.position );
 
-				//camera.position.x += ( mouseX - camera.position.x ) * .05;
-				//camera.position.y += ( - mouseY - camera.position.y ) * .05;
+		renderer.render( scene, camera );
 
-				camera.lookAt( scene.position );
-
-				renderer.render( scene, camera );
-
-			}
-
-		</script>
+	}
+</script>

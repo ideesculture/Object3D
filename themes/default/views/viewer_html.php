@@ -148,13 +148,13 @@ else{
 				THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
 
 				var mtlLoader = new THREE.MTLLoader();
-				mtlLoader.setPath('http://object3d.dev/<?php print $folderurl; ?>/'); //récupérer le path vers le dossier qui contient les fichiers
 				//mtlLoader.setBaseUrl('<?php print $folderurl; ?>');
 				if(<?php print $load ?> == true){
 					window.onclick = loadFunction();
 				}
 
 				function loadFunction(){
+					mtlLoader.setPath('http://object3d.dev/<?php print $folderurl; ?>/'); //récupérer le path vers le dossier qui contient les fichiers
 					mtlLoader.load('<?php print $foldername; ?>.mtl', function( materials ) { //récupérer le nom du mtl
 
 						materials.preload();
@@ -180,7 +180,7 @@ else{
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				//document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 				//
 
@@ -200,12 +200,12 @@ else{
 
 			}
 
-			function onDocumentMouseMove( event ) {
+			//function onDocumentMouseMove( event ) {
 
-				mouseX = ( event.clientX - windowHalfX ) / 2;
-				mouseY = ( event.clientY - windowHalfY ) / 2;
+			//	mouseX = ( event.clientX - windowHalfX ) / 2;
+			//	mouseY = ( event.clientY - windowHalfY ) / 2;
 
-			}
+			//}
 
 			//
 
@@ -218,8 +218,8 @@ else{
 
 			function render() {
 
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+				//camera.position.x += ( mouseX - camera.position.x ) * .05;
+				//camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
 				camera.lookAt( scene.position );
 

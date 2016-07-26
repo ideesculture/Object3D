@@ -35,7 +35,7 @@ else{
 		if($test === TRUE){
 			exec('cd '.$path.' && mkdir '.$path_parts['filename'].' && chmod 777 '.$path_parts['filename'].'/');
 			$extract = $zip->extractTo($res.'/');
-			$ferme = $zip->close();;
+			$ferme = $zip->close();
 			exec('cd '.$path.' && chmod -R 777 *');
 		}
 		else{
@@ -87,7 +87,25 @@ else{
 
 <script src="<?php print __CA_URL_ROOT__."/app/plugins/Object3D/lib/"; ?>Threejs/js/Detector.js"></script>
 <script src="<?php print __CA_URL_ROOT__."/app/plugins/Object3D/lib/"; ?>Threejs/js/libs/stats.min.js"></script>
+<script src="<?php print __CA_URL_ROOT__."/app/plugins/Object3D/lib/"; ?>Threejs/js/OrbitControls.js"></script>
+<script src="<?php print __CA_URL_ROOT__."/app/plugins/Object3D/lib/"; ?>Threejs/js/TrackballControls.js"></script>
+<style>
+
+#preload {
+
+    display: block;
+    width: 120px;
+    text-align: center;
+    font-family: helvetica, arial;
+    background-color: #333;
+    padding: 40px;
+    border-radius: 24px;
+    margin: 120px auto 120px auto;
+
+}
+</style>
 <h2><?php print $foldername ?></h2>
+<p id="preload"></p>
 
 <script>
 
@@ -115,8 +133,22 @@ else{
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 250;
 
-				controls = new THREE.OrbitControls(camera);
-				controls.enableZoom = true;
+				controls = new THREE.TrackballControls( camera );
+
+				controls.rotateSpeed = 11.0;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
+
+				controls.noZoom = false;
+				controls.noPan = false;
+
+				controls.staticMoving = true;
+				controls.dynamicDampingFactor = 0.3;
+
+				controls.keys = [ 65, 83, 68 ];
+
+				controls.addEventListener( 'change', render );
+
 
 				// scene
 
@@ -129,11 +161,19 @@ else{
 				directionalLight.position.set( 0, 0, 1 ).normalize();
 				scene.add( directionalLight );
 
+				var isloaded = false;
+				var preload = document.getElementById("preload");
+
+				if(<?php print $load ?> == true && isloaded == false){
+					preload.textContent = "Click anywhere to load the image";
+					window.onclick = loadFunction;
+				}
 				// model
 
 				var onProgress = function ( xhr ) {
 					if ( xhr.lengthComputable ) {
 						var percentComplete = xhr.loaded / xhr.total * 100;
+						preload.textContent = Math.round(percentComplete, 2) + '% downloaded';
 						console.log( Math.round(percentComplete, 2) + '% downloaded' );
 					}
 				};
@@ -143,31 +183,33 @@ else{
 				THREE.Loader.Handlers.add( /\.dds$/i, new THREE.DDSLoader() );
 
 				var mtlLoader = new THREE.MTLLoader();
+				
+				
 				//mtlLoader.setBaseUrl('<?php print $folderurl; ?>');
-				if(<?php print $load ?> == true){
-					window.onclick = loadFunction();
-				}
+				
 
 				function loadFunction(){
-					mtlLoader.setPath('http://object3d.dev/<?php print $folderurl; ?>/'); //récupérer le path vers le dossier qui contient les fichiers
-					mtlLoader.load('<?php print $foldername; ?>.mtl', function( materials ) { //récupérer le nom du mtl
+					if(isloaded == false){
+						mtlLoader.setPath('http://pawtucket.dev/<?php print $folderurl; ?>/'); //récupérer le path vers le dossier qui contient les fichiers
+						mtlLoader.load('<?php print $foldername; ?>.mtl', function( materials ) { //récupérer le nom du mtl
+							materials.preload();
+							var objLoader = new THREE.OBJLoader();
+							objLoader.setMaterials( materials );
+							//objLoader.setBaseUrl('<?php print $folderurl; ?>');
+							objLoader.setPath('http://pawtucket.dev/<?php print $folderurl; ?>/'); //récupérer le path vers le dossier qui contient les fichiers
+							objLoader.load('<?php print $foldername; ?>.obj', function ( object ) { //récupérer le nom de l'object
 
-						materials.preload();
+								object.position.y = 0;
+								scene.add( object );
+								preload.style.display = "none";
 
-						var objLoader = new THREE.OBJLoader();
-						objLoader.setMaterials( materials );
-						//objLoader.setBaseUrl('<?php print $folderurl; ?>');
-						objLoader.setPath('http://object3d.dev/<?php print $folderurl; ?>/'); //récupérer le path vers le dossier qui contient les fichiers
-						objLoader.load('<?php print $foldername; ?>.obj', function ( object ) { //récupérer le nom de l'obj
+							}, onProgress, onError );
 
-							object.position.y = - 95;
-							scene.add( object );
-
-						}, onProgress, onError );
-
-					});
+						});	
+					}
+					isloaded = true;
+					
 				}
-
 				//
 
 				renderer = new THREE.WebGLRenderer();
@@ -207,6 +249,7 @@ else{
 			function animate() {
 
 				requestAnimationFrame( animate );
+				controls.update();
 				render();
 
 			}

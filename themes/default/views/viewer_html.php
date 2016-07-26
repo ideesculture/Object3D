@@ -1,7 +1,6 @@
 <?php
+
 require_once(__CA_APP_DIR__.'/models/ca_objects.php');
-
-
 
 $id_object = $_GET["id"];
 $vt_object = new ca_objects($id_object);
@@ -15,15 +14,11 @@ $path_parts = pathinfo($path3d);
 $path = str_replace("//media/".__CA_APP_NAME__, "", $path_parts['dirname']);
 $res = $path."/".$path_parts['filename'];
 $load = true;
-if(filesize($res)>10240){
-	$load=false;
-	die("l'objet à afficher est trop lourd et pourrait faire planter votre navigateur");
-}
-$folderurl = __CA_URL_ROOT__.str_replace(__CA_BASE_DIR__,"", $res)."/".$foldername;
+$folderurl = __CA_URL_ROOT__.str_replace(__CA_BASE_DIR__,"", $res);
 //var_dump($res);
 if(is_dir($res)){
-	if(is_file($res."/".pathinfo($path3dfilename)['filename'].".obj")){
-		print 'l obj a le bon nom';
+	if(is_dir($res.'/'.$foldername)){
+		$folderurl = $folderurl."/".$foldername;
 	}
 	exec('cd '.$res.'/');
 }
@@ -56,6 +51,10 @@ else{
 	}
 }
 
+if(filesize("http://pawtucket.dev".$folderurl."/".$foldername.".obj")>10000){
+	$load=false;
+	die("l'objet à afficher est trop lourd et pourrait faire planter votre navigateur");
+}
 
 
 ?>

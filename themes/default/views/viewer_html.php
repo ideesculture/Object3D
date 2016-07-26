@@ -14,6 +14,8 @@ $path3d = $vt_object->get("ca_objects.fichier3d", array("return"=>"path"));
 $path_parts = pathinfo($path3d);
 $path = str_replace("//media/".__CA_APP_NAME__, "", $path_parts['dirname']);
 $res = $path."/".$path_parts['filename'];
+$load = true;
+if(filesize($res)>20480) $load=false;
 $folderurl = __CA_URL_ROOT__.str_replace(__CA_BASE_DIR__,"", $res)."/".$foldername;
 //var_dump($res);
 if(is_dir($res)){
@@ -95,6 +97,8 @@ else{
 
 			var camera, scene, renderer;
 
+			var controls;
+
 			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
@@ -112,6 +116,9 @@ else{
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 250;
+
+				controls = new THREE.OrbitControls(camera);
+				controls.enableZoom = true;
 
 				// scene
 
@@ -140,22 +147,28 @@ else{
 				var mtlLoader = new THREE.MTLLoader();
 				mtlLoader.setPath('http://object3d.dev/<?php print $folderurl; ?>/'); //récupérer le path vers le dossier qui contient les fichiers
 				//mtlLoader.setBaseUrl('<?php print $folderurl; ?>');
-				mtlLoader.load('<?php print $foldername; ?>.mtl', function( materials ) { //récupérer le nom du mtl
+				if(<?php print $load ?> == true){
+					window.onclick = loadFunction();
+				}
 
-					materials.preload();
+				function loadFunction(){
+					mtlLoader.load('<?php print $foldername; ?>.mtl', function( materials ) { //récupérer le nom du mtl
 
-					var objLoader = new THREE.OBJLoader();
-					objLoader.setMaterials( materials );
-					//objLoader.setBaseUrl('<?php print $folderurl; ?>');
-					objLoader.setPath('http://object3d.dev/<?php print $folderurl; ?>/'); //récupérer le path vers le dossier qui contient les fichiers
-					objLoader.load('<?php print $foldername; ?>.obj', function ( object ) { //récupérer le nom de l'obj
+						materials.preload();
 
-						object.position.y = - 95;
-						scene.add( object );
+						var objLoader = new THREE.OBJLoader();
+						objLoader.setMaterials( materials );
+						//objLoader.setBaseUrl('<?php print $folderurl; ?>');
+						objLoader.setPath('http://object3d.dev/<?php print $folderurl; ?>/'); //récupérer le path vers le dossier qui contient les fichiers
+						objLoader.load('<?php print $foldername; ?>.obj', function ( object ) { //récupérer le nom de l'obj
 
-					}, onProgress, onError );
+							object.position.y = - 95;
+							scene.add( object );
 
-				});
+						}, onProgress, onError );
+
+					});
+				}
 
 				//
 
